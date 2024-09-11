@@ -1,21 +1,33 @@
-package com.remoti.order.management.system.service;
+package com.remoti.order.management.system.domain.service;
 
-import com.remoti.order.management.system.model.Order;
-import com.remoti.order.management.system.repository.OrderRepository;
+import com.remoti.order.management.system.domain.model.Order;
+import com.remoti.order.management.system.application.port.OrderRepository;
+import com.remoti.order.management.system.application.port.PaymentService;
+import com.remoti.order.management.system.domain.model.PaymentDetails;
+import com.remoti.order.management.system.enums.OrderStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    private final OrderRepository orderRepository;
+    private final PaymentService paymentService;
+
+    public OrderService(OrderRepository orderRepository, PaymentService paymentService) {
         this.orderRepository = orderRepository;
+        this.paymentService = paymentService;
     }
 
     public Mono<Order> createOrder(Order order) {
-        order.setStatus("CREATED");
+        order.setStatus(OrderStatus.CREATED.name());
         return orderRepository.save(order);
+    }
+
+    public Mono<Order> processPayment(String orderId, PaymentDetails paymentDetails) {
+        return orderRepository.findById(orderId)
+                .flatMap(order -> paymentService.processPayment(order, paymentDetails)
+                        .then(orderRepository.updateStatus(orderId, OrderStatus.PAID)));
     }
 
     public Mono<Order> getOrderById(String id) {
