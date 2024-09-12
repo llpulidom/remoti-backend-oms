@@ -33,7 +33,6 @@ public class DynamoDBOrderRepository implements OrderRepository {
 
     @Override
     public Mono<Order> findById(String orderId) {
-        // Implementar la lógica para encontrar el pedido en DynamoDB
         return Mono.fromFuture(() -> {
             GetItemRequest request = GetItemRequest.builder()
                     .tableName("Order")
@@ -62,6 +61,7 @@ public class DynamoDBOrderRepository implements OrderRepository {
                     ScanRequest request = ScanRequest.builder()
                             .tableName("Order")
                             .build();
+
                     return dynamoDbClient.scan(request);
                 })).flatMapIterable(ScanResponse::items)
                 .map(OrderMapper::fromDynamoDbItem);

@@ -1,6 +1,5 @@
 package com.remoti.order.management.system.utils;
 
-
 import com.remoti.order.management.system.model.LoggerDataDTO;
 import org.slf4j.Logger;
 
