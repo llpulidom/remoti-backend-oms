@@ -5,6 +5,8 @@ import com.remoti.order.management.system.application.port.OrderRepository;
 import com.remoti.order.management.system.application.port.PaymentService;
 import com.remoti.order.management.system.domain.model.PaymentDetails;
 import com.remoti.order.management.system.enums.OrderStatus;
+import com.remoti.order.management.system.infrastructure.adapter.aws.S3Service;
+import com.remoti.order.management.system.infrastructure.adapter.aws.SqsService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -13,14 +15,24 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final PaymentService paymentService;
+    private final S3Service s3Service;
+    private final SqsService sqsService;
 
-    public OrderService(OrderRepository orderRepository, PaymentService paymentService) {
+    public OrderService(OrderRepository orderRepository, PaymentService paymentService, S3Service s3Service, SqsService sqsService) {
         this.orderRepository = orderRepository;
         this.paymentService = paymentService;
+        this.s3Service = s3Service;
+        this.sqsService = sqsService;
     }
 
     public Mono<Order> createOrder(Order order) {
         order.setStatus(OrderStatus.CREATED.name());
+
+        String filePath = "src/main/resources/receipt.pdf";
+        s3Service.uploadOrderReceipt(order.getId(), filePath);
+
+        sqsService.sendOrderCreatedEvent(order.getId());
+
         return orderRepository.save(order);
     }
 

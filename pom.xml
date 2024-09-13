@@ -55,7 +55,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb</artifactId>
@@ -64,6 +63,16 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb-enhanced</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>sqs</artifactId>
 			<version>2.20.0</version>
 		</dependency>
 
